@@ -126,6 +126,11 @@ class MainActivity : AppCompatActivity() {
             val apiService = GoogleVisionApi.RestClient.create(this)
             doAsync {
                 try {
+                    runOnUiThread {
+                        Snackbar.make(backgroundImageView, "Making request please wait", Snackbar.LENGTH_SHORT)
+                        backgroundImageView.setColorFilter(this@MainActivity.getResources().getColor(R.color.colorAccent));
+                        pictureButton.setText("Please Wait")
+                    }
 
                     val originalImage = BitmapFactory.decodeFile(imageUri.getPath())
                     val rotatedImage = getRotatedImage(imageFileInputStream, originalImage)
@@ -141,9 +146,6 @@ class MainActivity : AppCompatActivity() {
                     val rawJson = Gson().toJson(requestLogos)
                     Timber.d(rawJson)
 
-                    runOnUiThread {
-                        Snackbar.make(backgroundImageView, "Making request please wait", Snackbar.LENGTH_SHORT)
-                    }
                     val key = BuildConfig.VISION_API_KEY
                     apiService.locateLogos(apiKey = key, body = requestLogos)
                             .subscribeOn(Schedulers.io())
@@ -155,7 +157,9 @@ class MainActivity : AppCompatActivity() {
                                 runOnUiThread {
                                     val censored = censorBitmap(logos, resizedImage)
                                     resizedImage.recycle()
+                                    backgroundImageView.setColorFilter(this@MainActivity.getResources().getColor(R.color.transparent))
                                     backgroundImageView.setImageBitmap(censored)
+                                    pictureButton.setText("Take Picture")
                                     Log.d("", "Got a result from UI")
                                     Toast.makeText(this@MainActivity, "Got a logo", Toast.LENGTH_SHORT)
 
@@ -257,7 +261,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun censorBitmap(response: LogoResponse, bitmap: Bitmap): Bitmap {
-        val space = 20
+        val space = 35
         val x = response.responses!![0]!!.logoAnnotations!![0]!!.boundingPoly!!.vertices!![3]!!.X!!
         var y = response.responses!![0]!!.logoAnnotations!![0]!!.boundingPoly!!.vertices!![3]!!.Y!!
         val oldW = response.responses!![0]!!.logoAnnotations!![0]!!.boundingPoly!!.vertices!![1]!!.X!! - response.responses!![0]!!.logoAnnotations!![0]!!.boundingPoly!!.vertices!![0]!!.X!!
