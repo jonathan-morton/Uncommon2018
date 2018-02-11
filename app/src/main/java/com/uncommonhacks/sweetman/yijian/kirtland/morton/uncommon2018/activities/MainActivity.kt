@@ -170,6 +170,7 @@ class MainActivity : AppCompatActivity() {
                                 Log.d("", "Got garbage")
                                 runOnUiThread {
                                     Snackbar.make(rootConstraintLayout, "No logos found", Snackbar.LENGTH_SHORT)
+                                    pictureButton.setText("Try again")
                                 }
 
                             })
@@ -261,7 +262,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun censorBitmap(response: LogoResponse, bitmap: Bitmap): Bitmap {
-        val space = 35
+        val space = 20
         val x = response.responses!![0]!!.logoAnnotations!![0]!!.boundingPoly!!.vertices!![3]!!.X!!
         var y = response.responses!![0]!!.logoAnnotations!![0]!!.boundingPoly!!.vertices!![3]!!.Y!!
         val oldW = response.responses!![0]!!.logoAnnotations!![0]!!.boundingPoly!!.vertices!![1]!!.X!! - response.responses!![0]!!.logoAnnotations!![0]!!.boundingPoly!!.vertices!![0]!!.X!!
